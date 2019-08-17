@@ -31,5 +31,5 @@ class Course(models.Model):
 class SelectionLog(models.Model):
     user = models.ForeignKey("User", related_name='selectionLog', on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True)
-    selectedCourse = models.ForeignKey("Course", related_name='course', on_delete=models.CASCADE)
+    selectedCourse = models.ForeignKey("Course", related_name='selectionLog', on_delete=models.CASCADE)
     valid = models.BooleanField(default=True)
