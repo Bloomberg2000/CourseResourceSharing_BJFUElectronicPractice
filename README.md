@@ -1,0 +1,2 @@
+# CourseResourceSharing_BJFUElectronicPractice
+ 课程资源共享平台-北京林业大学电子信息科学与技术专业2017级本科生实习
