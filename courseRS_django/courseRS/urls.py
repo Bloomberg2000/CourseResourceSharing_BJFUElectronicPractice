@@ -3,6 +3,7 @@ from courseRS import views
 
 urlpatterns = [
     path('user/', views.UserList.as_view()),
+    path('user/auth', views.AuthView.as_view()),
     path('user/<int:pk>', views.UserDetail.as_view()),
     path('college/', views.CollegeList.as_view()),
     path('college/<int:pk>', views.CollegeDetail.as_view()),

@@ -3,10 +3,10 @@ from django.db import models
 
 # Create your models here.
 class User(models.Model):
-    userName = models.CharField(max_length=100)
-    stuCode = models.CharField(max_length=10)
-    email = models.CharField(max_length=100)
-    phoneNum = models.CharField(max_length=11)
+    userName = models.CharField(max_length=100, unique=True)
+    stuCode = models.CharField(max_length=10, unique=True)
+    email = models.CharField(max_length=100, unique=True)
+    phoneNum = models.CharField(max_length=11, unique=True)
     password = models.CharField(max_length=100)
     school = models.CharField(max_length=100)
     college = models.CharField(max_length=100)
@@ -15,7 +15,7 @@ class User(models.Model):
 
 
 class College(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100,unique=True)
     offcialLink = models.CharField(max_length=1000)
 
 
