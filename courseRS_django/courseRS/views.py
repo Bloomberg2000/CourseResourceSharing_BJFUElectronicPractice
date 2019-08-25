@@ -12,9 +12,6 @@ from courseRS.utils import md5, is_login, who_is_login
 
 class AuthView(APIView):
     def get(self, request):
-        if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
-                            status=status.HTTP_401_UNAUTHORIZED)
         request.session.flush()
         return Response(status=status.HTTP_200_OK)
 
@@ -31,11 +28,11 @@ class AuthView(APIView):
                     request.session['USERUNIQUEID'] = current_user.pk
                     return Response({"userID": [current_user.pk]}, status=status.HTTP_202_ACCEPTED)
                 else:
-                    return Response({"password": ["Wrong password"]}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"detail": ["密码错误"]}, status=status.HTTP_400_BAD_REQUEST)
             except models.User.DoesNotExist:
-                return Response({"detail": ["User dose not exist"]}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"detail": ["用户不存在"]}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({"detail": ["Please make sure you fill in the required fields."]},
+            return Response({"detail": ["请确认必填字段已填写"]},
                             status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -53,7 +50,7 @@ class UserDetail(generics.RetrieveUpdateAPIView):
     # 获取用户信息
     def get(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -72,7 +69,7 @@ class UserDetail(generics.RetrieveUpdateAPIView):
     # 编辑用户信息
     def patch(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         if who_is_login(request) != self.get_object().pk:
             return Response({"detail": ["No permission, please log in with the corresponding account"]},
@@ -98,7 +95,7 @@ class CollegeList(generics.ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         return super().post(request, *args, **kwargs)
 
@@ -109,19 +106,19 @@ class CollegeDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def put(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         return super().put(request, *args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         return super().patch(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         return super().delete(request, *args, **kwargs)
 
@@ -132,7 +129,7 @@ class CourseList(generics.ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         return super().post(request, *args, **kwargs)
 
@@ -143,19 +140,19 @@ class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def put(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         return super().put(request, *args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         return super().patch(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         return super().delete(request, *args, **kwargs)
 
@@ -166,7 +163,7 @@ class SelectionLogList(generics.ListCreateAPIView):
 
     def get(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         self.queryset = SelectionLog.objects.filter(user=who_is_login(request)).all()
         response = super().get(request, *args, **kwargs)
@@ -175,7 +172,7 @@ class SelectionLogList(generics.ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         return super().post(request, *args, **kwargs)
 
@@ -186,6 +183,6 @@ class SelectionLogDetail(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         if not is_login(request):
-            return Response({"detail": ["Please Login First."]},
+            return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         return super().get(request, *args, **kwargs)

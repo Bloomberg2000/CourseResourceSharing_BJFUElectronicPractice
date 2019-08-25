@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('pk', 'userName', 'stuCode', 'email', 'phoneNum',
-                  'password', 'school', 'college', 'major', 'subordinateClass', 'selectionLog')
+                  'password', 'school', 'college', 'subordinateClass', 'selectionLog')
 
 
 class CollegeSerializer(serializers.ModelSerializer):

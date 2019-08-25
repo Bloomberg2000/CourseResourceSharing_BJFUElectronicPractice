@@ -10,12 +10,12 @@ class User(models.Model):
     password = models.CharField(max_length=100)
     school = models.CharField(max_length=100)
     college = models.CharField(max_length=100)
-    major = models.CharField(max_length=100)
     subordinateClass = models.CharField(max_length=100)
+    type = models.IntegerField(default=0)
 
 
 class College(models.Model):
-    name = models.CharField(max_length=100,unique=True)
+    name = models.CharField(max_length=100, unique=True)
     offcialLink = models.CharField(max_length=1000)
 
 

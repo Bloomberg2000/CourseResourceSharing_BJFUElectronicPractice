@@ -11,3 +11,8 @@ def is_login(request):
 
 def who_is_login(request):
     return request.session.get('USERUNIQUEID')
+
+
+class UserType:
+    STUDENT = 0
+    ADMIN = 1
