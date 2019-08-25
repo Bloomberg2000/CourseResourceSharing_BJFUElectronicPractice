@@ -1,0 +1,19 @@
+{
+  "name": "coursers_react",
+  "version": "1.0.0",
+  "description": "课程资源共享平台-北京林业大学电子信息科学与技术专业2017级本科生实习",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bloomberg2000/CourseResourceSharing_BJFUElectronicPractice.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bloomberg2000/CourseResourceSharing_BJFUElectronicPractice/issues"
+  },
+  "homepage": "https://github.com/Bloomberg2000/CourseResourceSharing_BJFUElectronicPractice#readme"
+}
