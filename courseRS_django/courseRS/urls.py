@@ -11,4 +11,5 @@ urlpatterns = [
     path('course/<int:pk>', views.CourseDetail.as_view()),
     path('selectionlog', views.SelectionLogList.as_view()),
     path('selectionlog/<int:pk>', views.SelectionLogDetail.as_view()),
+    path('update/', views.updateCourse),
 ]

@@ -18,14 +18,15 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('pk', 'userName', 'stuCode', 'email', 'phoneNum',
-                  'password', 'school', 'college', 'subordinateClass', 'selectionLog')
+        fields = ('pk', 'userName', 'email', 'phoneNum', 'userIDCard',
+                  'password', 'school', 'college', 'subordinateClass', 'type',
+                  'selectionLog')
 
 
 class CollegeSerializer(serializers.ModelSerializer):
     class Meta:
         model = College
-        fields = ('pk', 'name', 'offcialLink')
+        fields = ('pk', 'name', 'offcialLink', 'logoLink')
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -33,8 +34,8 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ('pk', 'name', 'subordinateSchoolAndCollege', 'openTime',
-                  'period', 'info', 'link', 'selectionLog')
+        fields = ('pk', 'name', 'subordinateSchoolAndCollege', 'checkInNum',
+                  'currentStatus', 'info', 'link', 'selectionLog')
 
 
 class SelectionLogSerializer(serializers.ModelSerializer):
@@ -47,7 +48,7 @@ class SelectionLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SelectionLog
-        fields = ('pk', 'user', 'selectedCourse', 'time', 'user_Name', 'selectedCourse_Name')
+        fields = ('pk', 'user', 'selectedCourse', 'time', 'user_Name', 'selectedCourse_Name', 'valid')
 
 
 def md5(text):

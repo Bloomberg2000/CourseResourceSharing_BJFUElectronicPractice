@@ -12,6 +12,11 @@ export default new Router({
             component: Home
         },
         {
+            path: '/checkinsystem',
+            name: 'checkinsystem',
+            component: () => import('./views/CheckInSystem.vue')
+        },
+        {
             path: '/friendlylink',
             name: 'friendlylink',
             component: () => import('./views/FriendlyLink.vue')
@@ -22,9 +27,9 @@ export default new Router({
             component: () => import('./views/UserHome.vue')
         },
         {
-            path: '/checkinlog',
-            name: 'checkinlog',
-            component: () => import('./views/CheckInLog.vue')
+            path: '/admin',
+            name: 'admin',
+            component: () => import('./views/Admin.vue')
         }
     ]
 })

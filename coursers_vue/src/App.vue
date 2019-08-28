@@ -1,103 +1,119 @@
 <template>
-    <a-layout id="app" style="min-height: 100vh">
-        <a-layout-sider collapsible v-model="collapsed">
-            <div class="logo">
-                <img style="height: 32px" :src="imgpath.public.logo"/>
-                <span class="logoText" v-show="!collapsed">课程共享平台</span>
-            </div>
-            <a-menu theme="dark" @click="NavClick" :defaultSelectedKeys="['1']" mode="inline">
-                <a-menu-item key="home">
-                    <a-icon type="schedule"/>
-                    <span>选课系统</span>
-                </a-menu-item>
-                <a-menu-item key="friendlylink">
-                    <a-icon type="team"/>
-                    <span>友情链接</span>
-                </a-menu-item>
-                <a-sub-menu key="sub1">
-                    <span slot="title"><a-icon type="user"/><span>个人中心</span></span>
-                    <a-menu-item key="userhome">我的信息</a-menu-item>
-                    <a-menu-item key="checkinlog">选课记录</a-menu-item>
-                </a-sub-menu>
-            </a-menu>
-        </a-layout-sider>
-        <a-layout>
-            <a-menu mode="horizontal" @click="topNavClick" :style="{ textAlign: 'right' }">
-                <a-menu-item v-show="!isLogin" key="login">
-                    <a-icon type="login"/>
-                    登录
-                </a-menu-item>
-                <a-menu-item v-show="!isLogin" key="register">
-                    <a-icon type="user-add"/>
-                    注册
-                </a-menu-item>
-                <a-menu-item v-if="isLogin" key="userName">
-                    <a-icon type="user"/>
-                    {{userInfo.userName}}
-                </a-menu-item>
-                <a-menu-item v-show="isLogin" key="logout">
-                    <a-icon type="logout"/>
-                    注销
-                </a-menu-item>
-            </a-menu>
-            <!--            </a-layout-header>-->
-            <a-layout-content style="margin: 0 16px">
+    <a-locale-provider :locale="zhCN">
+        <a-layout id="app" style="min-height: 100vh">
+            <a-layout-header>
+                <div class="logo">
+                    <img style="height: 32px" :src="imgpath.public.logo"/>
+                    <span class="logoText">
+                    半熟芝士共享平台
+                </span>
+                </div>
+                <a-menu theme="dark" mode="horizontal" @click="NavClick" :defaultSelectedKeys="['home']"
+                        :style="{ lineHeight: '64px' }">
+                    <a-menu-item key="home">
+                        <a-icon type="home"/>
+                        <span>首页</span>
+                    </a-menu-item>
+                    <a-menu-item key="checkinsystem">
+                        <a-icon type="schedule"/>
+                        <span>选课系统</span>
+                    </a-menu-item>
+                    <a-menu-item key="friendlylink">
+                        <a-icon type="team"/>
+                        <span>友情链接</span>
+                    </a-menu-item>
+                    <a-menu-item v-if="!isLogin" key="login" class="nav-right">
+                        <a-icon type="login"/>
+                        登录
+                    </a-menu-item>
+                    <a-menu-item v-if="!isLogin" key="register" class="nav-right">
+                        <a-icon type="user-add"/>
+                        注册
+                    </a-menu-item>
+                    <a-menu-item v-if="isLogin" key="logout" class="nav-right">
+                        <a-icon type="logout"/>
+                        注销
+                    </a-menu-item>
+                    <a-sub-menu v-if="isLogin" key="sub1" class="nav-right">
+                        <span slot="title"><a-icon type="user"/><span>{{userInfo.userName}}</span></span>
+                        <a-menu-item key="userhome">我的信息</a-menu-item>
+                        <a-menu-item v-if="this.currentUserType === '1'" key="admin">后台管理</a-menu-item>
+                    </a-sub-menu>
+                </a-menu>
+            </a-layout-header>
+            <a-layout-content style="padding: 0 50px">
                 <router-view/>
             </a-layout-content>
             <a-layout-footer style="text-align: center">
-                课程共享平台 ©2018
+                课程共享平台 © 半熟芝士团队TM 2019
             </a-layout-footer>
-        </a-layout>
-        <a-modal title="登录" :visible="LoginModalShow" footer @cancel="closeModal">
-            <a-form id="components-form-demo-normal-login" :form="LoginForm" prop="LoginForm" class="login-form"
-                    @submit="doLogin">
-                <a-form-item>
-                    <a-input v-decorator="['userName',{ rules: [{ required: true, message: '用户名不能为空' }] }]"
-                             placeholder="请输入用户名/邮箱/手机号/学号">
-                        <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)"/>
-                    </a-input>
-                </a-form-item>
-                <a-form-item>
-                    <a-input v-decorator="['password',{ rules: [{ required: true, message: '密码不能为空' }] }]"
-                             type="password" placeholder="密码">
-                        <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)"/>
-                    </a-input>
-                </a-form-item>
-                <a-form-item>
-                    <a-button type="primary" html-type="submit" class="login-form-button">
-                        登录
-                    </a-button>
-                    或者 <a>现在注册</a>
-                    <a class="login-form-forgot">忘记密码</a>
-                </a-form-item>
-            </a-form>
-        </a-modal>
-        <a-modal title="注册" :visible="RegisterModalShow" @cancel="closeModal">
-            <template slot="footer">
-                <a-button key="back" @click="closeModal">取消</a-button>
-                <a-button key="submit" type="primary" @click="doRegister">注册</a-button>
-            </template>
-            <a-form :form="RegisterForm" prop="RegisterForm" layout="horizontal" @submit="doLogin">
-                <a-form-item label="用户名" :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                    <a-input v-decorator="['userName',
+            <a-modal title="登录" :visible="LoginModalShow" footer @cancel="closeModal">
+                <a-form id="components-form-demo-normal-login" :form="LoginForm" prop="LoginForm" class="login-form"
+                        @submit="doLogin">
+                    <a-form-item>
+                        <a-input v-decorator="['userName',{ rules: [{ required: true, message: '用户名不能为空' }] }]"
+                                 placeholder="请输入用户名/邮箱/手机号">
+                            <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)"/>
+                        </a-input>
+                    </a-form-item>
+                    <a-form-item>
+                        <a-input v-decorator="['password',{ rules: [{ required: true, message: '密码不能为空' }] }]"
+                                 type="password" placeholder="密码">
+                            <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)"/>
+                        </a-input>
+                    </a-form-item>
+                    <a-form-item>
+                        <a-button type="primary" html-type="submit" class="login-form-button">
+                            登录
+                        </a-button>
+                        或者 <a>现在注册</a>
+                        <a class="login-form-forgot">忘记密码</a>
+                    </a-form-item>
+                </a-form>
+            </a-modal>
+            <a-modal title="注册" :visible="RegisterModalShow" @cancel="closeModal">
+                <template slot="footer">
+                    <a-button key="back" @click="closeModal">取消</a-button>
+                    <a-button key="submit" type="primary" @click="doRegister">注册</a-button>
+                </template>
+                <a-form :form="RegisterForm" prop="RegisterForm" layout="horizontal" @submit="doRegister">
+                    <a-form-item label="类别" :label-col="formItemLayout.labelCol"
+                                 :wrapper-col="formItemLayout.wrapperCol">
+                        <a-radio-group v-decorator="['type',
+                                            {
+                                                rules: [ {
+                                                  required: true, message: '请选择类别',
+                                                }]
+                                          }
+                                        ]">
+                            <a-radio-button value="0">学生</a-radio-button>
+                            <a-radio-button value="1">教师</a-radio-button>
+                        </a-radio-group>
+                    </a-form-item>
+                    <a-form-item label="用户名" :label-col="formItemLayout.labelCol"
+                                 :wrapper-col="formItemLayout.wrapperCol">
+                        <a-input v-decorator="['userName',
                                             {
                                                 rules: [ {
                                                   required: true, message: '请输入用户名',
                                                 }]
                                           }
                                         ]"/>
-                </a-form-item>
-                <a-form-item label="学号" :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                    <a-input v-decorator="['stuCode',
+                    </a-form-item>
+                    <a-form-item :label="this.RegisterForm.getFieldValue('type') === '0' ? '学号' : '教工号'"
+                                 :label-col="formItemLayout.labelCol"
+                                 :wrapper-col="formItemLayout.wrapperCol">
+                        <a-input v-decorator="['userIDCard',
                                             {
                                                 rules: [ {
-                                                  required: true, message: '请输入学号',
+                                                  required: true, message: this.RegisterForm.getFieldValue('type') === '0' ? '请输入学号' : '请输入教工号',
                                                 }]
                                           }
                                         ]"/>
-                </a-form-item>
-                <a-form-item label="电子邮箱" :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                    <a-input v-decorator="['email',
+                    </a-form-item>
+                    <a-form-item label="电子邮箱" :label-col="formItemLayout.labelCol"
+                                 :wrapper-col="formItemLayout.wrapperCol">
+                        <a-input v-decorator="['email',
                                             {
                                                 rules: [{
                                                   type: 'email', message: '电子邮箱格式不正确',
@@ -106,9 +122,10 @@
                                                 }]
                                           }
                                         ]"/>
-                </a-form-item>
-                <a-form-item label="手机号码" :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                    <a-input v-decorator="['phoneNum',
+                    </a-form-item>
+                    <a-form-item label="手机号码" :label-col="formItemLayout.labelCol"
+                                 :wrapper-col="formItemLayout.wrapperCol">
+                        <a-input v-decorator="['phoneNum',
                                           {
                                             rules: [{
                                                 required: true, message: '请输入手机号码'
@@ -117,44 +134,43 @@
                                              }],
                                           }
                                         ]" style="width: 100%"
-                    >
-                        <a-select slot="addonBefore" v-decorator="['prefix',{ initialValue: '86' }]"
-                                  style="width: 70px">
-                            <a-select-option value="86">
-                                +86
-                            </a-select-option>
-                        </a-select>
-                    </a-input>
-                </a-form-item>
-                <a-form-item label="学校" :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                    <a-input v-decorator="['school',
+                        >
+                            <a-select slot="addonBefore" v-decorator="['prefix',{ initialValue: '86' }]"
+                                      style="width: 70px">
+                                <a-select-option value="86">
+                                    +86
+                                </a-select-option>
+                            </a-select>
+                        </a-input>
+                    </a-form-item>
+                    <a-form-item label="学校" :label-col="formItemLayout.labelCol"
+                                 :wrapper-col="formItemLayout.wrapperCol">
+                        <a-input v-decorator="['school',
                                             {
                                                 rules: [ {
                                                   required: true, message: '请输入学校',
                                                 }]
                                           }
                                         ]"/>
-                </a-form-item>
-                <a-form-item label="学院" :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                    <a-input v-decorator="['college',
+                    </a-form-item>
+                    <a-form-item label="学院" :label-col="formItemLayout.labelCol"
+                                 :wrapper-col="formItemLayout.wrapperCol">
+                        <a-input v-decorator="['college',
                                             {
                                                 rules: [ {
                                                   required: true, message: '请输入学院',
                                                 }]
                                           }
                                         ]"/>
-                </a-form-item>
-                <a-form-item label="班级" :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                    <a-input v-decorator="['subordinateClass',
-                                            {
-                                                rules: [ {
-                                                  required: true, message: '请输入班级',
-                                                }]
-                                          }
-                                        ]"/>
-                </a-form-item>
-                <a-form-item label="密码" :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                    <a-input v-decorator="['password',
+                    </a-form-item>
+                    <a-form-item v-show="this.RegisterForm.getFieldValue('type') === '0'" label="班级"
+                                 :label-col="formItemLayout.labelCol"
+                                 :wrapper-col="formItemLayout.wrapperCol">
+                        <a-input v-decorator="['subordinateClass']"/>
+                    </a-form-item>
+                    <a-form-item label="密码" :label-col="formItemLayout.labelCol"
+                                 :wrapper-col="formItemLayout.wrapperCol">
+                        <a-input v-decorator="['password',
                                             {
                                                 rules: [{
                                                   required: true, message: '请输入密码',
@@ -163,11 +179,11 @@
                                                 }],
                                               }
                                             ]"
-                             type="password"/>
-                </a-form-item>
-                <a-form-item label="再次输入密码" :label-col="formItemLayout.labelCol"
-                             :wrapper-col="formItemLayout.wrapperCol">
-                    <a-input v-decorator="['confirm',
+                                 type="password"/>
+                    </a-form-item>
+                    <a-form-item label="再次输入密码" :label-col="formItemLayout.labelCol"
+                                 :wrapper-col="formItemLayout.wrapperCol">
+                        <a-input v-decorator="['confirm',
                                               {
                                                 rules: [{
                                                   required: true, message: '请再次输入密码',
@@ -176,26 +192,34 @@
                                                 }],
                                               }
                                             ]"
-                             type="password"
-                             @blur="handleConfirmBlur"/>
-                </a-form-item>
-            </a-form>
-        </a-modal>
-    </a-layout>
+                                 type="password"
+                                 @blur="handleConfirmBlur"/>
+                    </a-form-item>
+                </a-form>
+            </a-modal>
+        </a-layout>
+    </a-locale-provider>
 </template>
 <script>
+    import zhCN from 'ant-design-vue/lib/locale-provider/zh_CN';
     import axios from 'axios'
     import {Auth, User} from "./assets/js/url";
 
     export default {
+        provide() {
+            return {
+                login: this.login,
+                register: this.register
+            }
+        },
         beforeCreate() {
             this.LoginForm = this.$form.createForm(this, {prop: 'LoginForm'});
             this.RegisterForm = this.$form.createForm(this, {prop: 'RegisterForm'});
         },
         data() {
             return {
+                zhCN,
                 confirmDirty: false,
-                collapsed: true,
                 LoginModalShow: false,
                 RegisterModalShow: false,
                 timer: '',
@@ -223,7 +247,8 @@
                     }
                 ).catch(
                     err => {
-                        this.$store.commit("userChange", '');
+                        that.$store.commit("userChange", '');
+                        this.$store.commit("userTypeChange", '0');
                         this.$Message.info(err.response.data.message);
                     }
                 )
@@ -232,7 +257,6 @@
                 e.preventDefault();
                 this.LoginForm.validateFields((err, values) => {
                     if (!err) {
-                        console.log('Received values of form: ', values);
                         let formData = new FormData();
                         formData.append('userName', values.userName);
                         formData.append('password', values.password);
@@ -241,6 +265,7 @@
                                 if (res.status === 202) {
                                     this.$message.info("登录成功");
                                     this.$store.commit("userChange", res.data.userID[0] + '');
+                                    this.$store.commit("userTypeChange", res.data.userType[0] + '');
                                     this.closeModal();
                                 }
                             }
@@ -257,19 +282,23 @@
                 this.RegisterForm.validateFields((err, values) => {
                     if (!err) {
                         let formData = new FormData();
+                        formData.append('type', values.type);
                         formData.append('userName', values.userName);
-                        formData.append('stuCode', values.stuCode);
+                        formData.append('userIDCard', values.userIDCard);
                         formData.append('email', values.email);
                         formData.append('phoneNum', values.phoneNum);
                         formData.append('password', values.password);
                         formData.append('school', values.school);
                         formData.append('college', values.college);
-                        formData.append('subordinateClass', values.subordinateClass);
+                        if (values.type === '0') {
+                            formData.append('subordinateClass', values.subordinateClass);
+                        }
                         axios.post(User, formData).then(
                             res => {
                                 if (res.status === 201) {
                                     this.$message.info("注册成功");
                                     this.closeModal();
+                                    this.RegisterForm.resetFields()
                                 }
                             }
                         ).catch(
@@ -305,9 +334,18 @@
                 }
                 callback();
             },
+            login() {
+                this.LoginModalShow = true;
+            },
+            register() {
+                this.RegisterModalShow = true;
+            },
             NavClick(item) {
                 if (item.key === 'home') {
                     this.$router.push('/');
+                }
+                if (item.key === 'checkinsystem') {
+                    this.$router.push('/checkinsystem');
                 }
                 if (item.key === 'friendlylink') {
                     this.$router.push('/friendlylink');
@@ -315,16 +353,14 @@
                 if (item.key === 'userhome') {
                     this.$router.push('/userhome');
                 }
-                if (item.key === 'checkinlog') {
-                    this.$router.push('checkinlog');
+                if (item.key === 'admin') {
+                    this.$router.push('admin');
                 }
-            },
-            topNavClick(item) {
                 if (item.key === 'login') {
-                    this.LoginModalShow = true;
+                    this.login();
                 }
                 if (item.key === 'register') {
-                    this.RegisterModalShow = true;
+                    this.register();
                 }
                 if (item.key === 'logout') {
                     let that = this;
@@ -338,9 +374,11 @@
                                 res => {
                                     if (res.status === 200) {
                                         that.$store.commit("userChange", '');
+                                        this.$store.commit("userTypeChange", '0');
                                         that.userInfo = [];
                                         that.isLoginWatcher();
                                         that.$message.info("注销成功");
+                                        this.$router.push('/')
                                     }
                                 }
                             ).catch(
@@ -388,21 +426,28 @@
             currentUserID() {
                 return this.$store.state.currentUserID;
             },
+            currentUserType() {
+                return this.$store.state.currentUserType;
+            },
         }
     }
 </script>
 
 <style>
     #app .logo {
-        height: 32px;
-        margin: 21px;
+        /*width: 200px;*/
+        height: 31px;
+        float: left;
     }
 
-    .logo .logoText {
+    #app .logo .logoText {
         font-size: 15px;
         color: #ffffff;
         padding: 10px;
+    }
 
+    .nav-right {
+        float: right;
     }
 
     #components-form-demo-normal-login .login-form {

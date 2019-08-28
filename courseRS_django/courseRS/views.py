@@ -1,13 +1,19 @@
+import json
+
+from django.http import HttpResponse
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from courseRS import models
+from courseRS.filters import CollegeFilter, CourseFilter
 from courseRS.models import User, College, Course, SelectionLog
+from courseRS.mooc_helper import crawl_mooc
 from courseRS.serializers import UserSerializer, CollegeSerializer, CourseSerializer, \
     SelectionLogSerializer
 from django.db.models import Q
-from courseRS.utils import md5, is_login, who_is_login
+from courseRS.utils import md5, is_login, who_is_login, StandardPagination
 
 
 class AuthView(APIView):
@@ -20,13 +26,13 @@ class AuthView(APIView):
         password = request.POST.get('password')
         if userName and password:
             try:
-                current_user = models.User.objects.get(
-                    Q(userName=userName) | Q(phoneNum=userName) | Q(email=userName) | Q(stuCode=userName))
+                current_user = models.User.objects.get(Q(userName=userName) | Q(phoneNum=userName) | Q(email=userName))
                 password = md5(password)
                 if current_user.password == password:
                     request.session['ISLOGIN'] = "true"
                     request.session['USERUNIQUEID'] = current_user.pk
-                    return Response({"userID": [current_user.pk]}, status=status.HTTP_202_ACCEPTED)
+                    return Response({"userID": [current_user.pk], "userType": [current_user.type]},
+                                    status=status.HTTP_202_ACCEPTED)
                 else:
                     return Response({"detail": ["密码错误"]}, status=status.HTTP_400_BAD_REQUEST)
             except models.User.DoesNotExist:
@@ -72,7 +78,7 @@ class UserDetail(generics.RetrieveUpdateAPIView):
             return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         if who_is_login(request) != self.get_object().pk:
-            return Response({"detail": ["No permission, please log in with the corresponding account"]},
+            return Response({"detail": ["权限不足，请使用对应账号登录"]},
                             status=status.HTTP_403_FORBIDDEN)
         # 如果要修改密码进行对应判断
         if request.POST.__contains__('password'):
@@ -92,6 +98,9 @@ class UserDetail(generics.RetrieveUpdateAPIView):
 class CollegeList(generics.ListCreateAPIView):
     queryset = College.objects.all()
     serializer_class = CollegeSerializer
+    pagination_class = StandardPagination
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = CollegeFilter
 
     def post(self, request, *args, **kwargs):
         if not is_login(request):
@@ -126,6 +135,9 @@ class CollegeDetail(generics.RetrieveUpdateDestroyAPIView):
 class CourseList(generics.ListCreateAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    pagination_class = StandardPagination
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = CourseFilter
 
     def post(self, request, *args, **kwargs):
         if not is_login(request):
@@ -158,14 +170,15 @@ class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class SelectionLogList(generics.ListCreateAPIView):
-    queryset = SelectionLog.objects.all()
+    queryset = SelectionLog.objects.all().filter(valid=1)
     serializer_class = SelectionLogSerializer
+    pagination_class = StandardPagination
 
     def get(self, request, *args, **kwargs):
         if not is_login(request):
             return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
-        self.queryset = SelectionLog.objects.filter(user=who_is_login(request)).all()
+        self.queryset = SelectionLog.objects.filter(user=who_is_login(request)).filter(valid=True).order_by('-time').all()
         response = super().get(request, *args, **kwargs)
         self.queryset = SelectionLog.objects.all()
         return response
@@ -177,8 +190,8 @@ class SelectionLogList(generics.ListCreateAPIView):
         return super().post(request, *args, **kwargs)
 
 
-class SelectionLogDetail(generics.RetrieveAPIView):
-    queryset = SelectionLog.objects.all()
+class SelectionLogDetail(generics.RetrieveUpdateAPIView):
+    queryset = SelectionLog.objects.filter(valid=True).all()
     serializer_class = SelectionLogSerializer
 
     def get(self, request, *args, **kwargs):
@@ -186,3 +199,22 @@ class SelectionLogDetail(generics.RetrieveAPIView):
             return Response({"detail": ["请先登录"]},
                             status=status.HTTP_401_UNAUTHORIZED)
         return super().get(request, *args, **kwargs)
+
+    # 禁止通过PUT修改
+    def put(self, request, *args, **kwargs):
+        return Response({"detail": "Method \"PUT\" not allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    # 编辑用户信息
+    def patch(self, request, *args, **kwargs):
+        if not is_login(request):
+            return Response({"detail": ["请先登录"]},
+                            status=status.HTTP_401_UNAUTHORIZED)
+        if who_is_login(request) != self.get_object().user_id:
+            return Response({"detail": ["权限不足，请使用对应账号登录"]},
+                            status=status.HTTP_403_FORBIDDEN)
+        return super().patch(request, *args, **kwargs)
+
+
+def updateCourse(request):
+    crawl_mooc()
+    return HttpResponse(json.dumps("OK", ensure_ascii=False), content_type="application/json,charset=utf-8")
