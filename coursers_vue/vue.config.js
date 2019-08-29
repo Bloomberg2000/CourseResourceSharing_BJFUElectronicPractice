@@ -1,4 +1,6 @@
 const path = require('path')
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
+const productionGzipExtensions = ['js', 'css']
 
 function resolve(dir) {
     return path.join(__dirname, dir)
@@ -23,6 +25,17 @@ module.exports = {
     productionSourceMap: false,
     // webpack配置
     // 对内部的 webpack 配置进行更细粒度的修改 https://github.com/neutrinojs/webpack-chain see https://github.com/vuejs/vue-cli/blob/dev/docs/webpack.md
+    configureWebpack: config => {
+        if (process.env.NODE_ENV === 'production') {//GZIP压缩
+            return {
+                plugins: [new CompressionWebpackPlugin({
+                    test: /\.(js|css)(\?.*)?$/i,//需要压缩的文件正则
+                    threshold: 10240,//文件大小大于这个值时启用压缩
+                    deleteOriginalAssets: false//压缩后保留原文件
+                })]
+            };
+        }
+    },
     chainWebpack: config => {
         config.module
             .rule('images')
@@ -51,24 +64,34 @@ module.exports = {
             // css预设器配置项
             loaderOptions:
                 {}
-        },
+        }
+    ,
     // webpack-dev-server 相关配置 https://webpack.js.org/configuration/dev-server/
     devServer: {
         host: 'localhost',
-        port: 8080, // 端口号
-        https: false, // https:{brand:Boolean}
-        open: true, // 配置自动启动浏览器  http://172.16.1.12:7071/rest/mcdPhoneBar/
-        hotOnly: true, // 热更新
-        proxy: { // 配置自动启动浏览器
-            "/courseRS":
-                {
-                    target: "http://0.0.0.0:8000/",
-                    changeOrigin: true,
-                    ws: false,//websocket支持
-                    secure: false
-                }
-        }
-    },
+        port:
+            8080, // 端口号
+        https:
+            false, // https:{brand:Boolean}
+        open:
+            true, // 配置自动启动浏览器  http://172.16.1.12:7071/rest/mcdPhoneBar/
+        hotOnly:
+            true, // 热更新
+        proxy:
+            { // 配置自动启动浏览器
+                "/courseRS":
+                    {
+                        target: "http://0.0.0.0:8000/",
+                        changeOrigin:
+                            true,
+                        ws:
+                            false,//websocket支持
+                        secure:
+                            false
+                    }
+            }
+    }
+    ,
     // 第三方插件配置 https://www.npmjs.com/package/vue-cli-plugin-style-resources-loader
     pluginOptions: {
         'style-resources-loader':

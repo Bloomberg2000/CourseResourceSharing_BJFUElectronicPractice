@@ -20,8 +20,8 @@
     </div>
 </template>
 <script>
-    import CourseAdmin from "../components/CourseAdmin";
-    import CollegeAdmin from "../components/CollegeAdmin";
+    const CourseAdmin = () => import('../components/CourseAdmin');
+    const CollegeAdmin = () => import('../components/CollegeAdmin');
 
     export default {
         components: {
