@@ -78,7 +78,7 @@
         <a-modal v-if="visible" class="detail_modal" title="课程详情" v-model="visible">
             <template slot="footer">
                 <a-button key="back" @click="visible = false">关闭</a-button>
-                <a-button key="submit" type="primary" @click="checkInClass(item)">去选课</a-button>
+                <a-button key="submit" type="primary" @click="checkInClass(courseInfo)">去选课</a-button>
             </template>
 
             <div class="title">{{courseInfo.name}}</div>
@@ -90,7 +90,7 @@
             <a-list
                     style="padding: 12px"
                     class="comment-list"
-                    :header="`${data.length} replies`"
+                    :header="`${data.length} 条评论`"
                     itemLayout="horizontal"
                     :dataSource="data"
             >
@@ -123,18 +123,11 @@
             return {
                 data: [
                     {
-                        actions: ['Reply to'],
-                        author: 'Han Solo',
+                        actions: ['回复'],
+                        author: '测试用户',
                         avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-                        content: 'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
+                        content: '这是一条评论',
                         datetime: moment().subtract(1, 'days'),
-                    },
-                    {
-                        actions: ['Reply to'],
-                        author: 'Han Solo',
-                        avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-                        content: 'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
-                        datetime: moment().subtract(2, 'days'),
                     },
                 ],
                 moment,

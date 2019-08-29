@@ -66,8 +66,8 @@
                         <a-button type="primary" html-type="submit" class="login-form-button">
                             登录
                         </a-button>
-                        或者 <a>现在注册</a>
-                        <a class="login-form-forgot">忘记密码</a>
+                        或者 <a @click="RegisterModalShow = true">现在注册</a>
+<!--                        <a class="login-form-forgot">忘记密码</a>-->
                     </a-form-item>
                 </a-form>
             </a-modal>
